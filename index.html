@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo's</title>
+</head>
+
+<body>
+    <h3>ToDo's</h3>
+    <form action="#" onsubmit="registerUser(event)" id="register">
+        <label for="taskName" mx="6">TodoName</label>
+        <input type="text" name="newTask" id="taskName" required>
+        <label for="taskDis" >Description</label>
+        <input type="text" name="Discription" id="taskDis"  required>
+        <button id="task" style="background-color: rgb(181, 244, 97);">Add Task</button>
+    </form>
+    <ul id="taskList">
+        <h4>**Pending Tasks</h4>
+    </ul>
+    <ul id="doneTasks">
+        <h4>**Done Tasks</h4>
+    </ul>
+    <style>
+        *{
+            padding:4px 8px 4px;
+            border-radius: 4px;
+        }
+        h4{
+            color: brown;
+            background-color: antiquewhite;
+        }
+        h3{
+            text-align: center;
+        }
+        
+        
+        
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
+    <script>
+        function registerUser(e) {
+            e.preventDefault();
+            alert("Task added Successfully");
+
+            var taskName = document.getElementById('taskName').value;
+            var taskDis = document.getElementById('taskDis').value;
+
+            var obj = {
+                taskName, taskDis
+            };
+            axios.post("https://crudcrud.com/api/5ac0f4fd052e4d6cb46e04b5b875148e/todos", obj)
+                .then((response) => {
+                    DispUser(response.data);
+                })
+                .catch((err) => {
+                    document.body.innerHTML = document.body.innerHTML + "<h4> Something went wrong...<h4>"
+                    console.log(err)
+                })
+        }
+        window.addEventListener("DOMContentLoaded", () => {
+            const data = axios.get("https://crudcrud.com/api/5ac0f4fd052e4d6cb46e04b5b875148e/todos")
+                .then((response) => {
+                    for (var i = 0; i < response.data.length; i++) {
+                        DispUser(response.data[i]);
+                    }
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+            console.log(data)
+        })
+        function DispUser(obj) {
+            var pElement = document.getElementById('taskList');
+            var pElement1 = document.getElementById('doneTasks');
+            var cElement = document.createElement('li');
+            
+            cElement.textContent = obj.taskName + " - " + obj.taskDis;
+
+            var del = document.createElement('input');
+            del.type = 'button';
+            del.value = 'Delete';
+
+            function deleteUser(userId) {
+                axios.delete('https://crudcrud.com/api/5ac0f4fd052e4d6cb46e04b5b875148e/todos/' + userId)
+                    .then((response) => {
+                        console.log(response);
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+            }
+
+            var done = document.createElement('input');
+            done.type = 'button';
+            done.value = 'Done';
+
+            function taskDone(userId) {
+                pElement1.appendChild(cElement);
+            }
+            cElement.appendChild(done);
+            cElement.appendChild(del);
+
+            del.onclick = () => {
+                pElement.removeChild(cElement);
+                deleteUser(obj._id);
+            }
+            done.onclick = () => {
+
+                pElement.removeChild(cElement);
+                taskDone(obj._id);
+                deleteUser(obj._id);
+            }
+            pElement.appendChild(cElement);
+        }
+
+    </script>
+
+
+</body>
+
+</html>
