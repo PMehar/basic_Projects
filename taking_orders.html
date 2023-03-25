@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>take orders</title>
+</head>
+
+<body>
+    <h3>Making Waiters Life Easy..</h3>
+    <form action="#" onsubmit="takeOrder(event)" id="register">
+        <label for="price" mx="6">Choose Price :</label>
+        <input type="number" name="price" id="price" required>
+
+        <label> Choose Dish</label>
+        <select type="form-select" name="selected" id="dish" required>
+            <option selected>select from here</option>
+            <option value="Fried Rice">Fried Rice</option>
+            <option value="Manchurian">Manchurian</option>
+            <option value="Noodles">Noodles</option>
+            <option value="Dosa">Dosa</option>
+            <option value="Lassi">Lassi</option>
+            <option value="Idali">Idali</option>
+            <option value="Ice-cream">Ice-cream</option>
+            <option value="Samosa">Samosa</option>
+            <option value="Veg-Biriyani">Veg-Biriyani</option>
+            <option value="Chicken-Biriyani">Chicken-Biriyani</option>
+        </select>
+
+        <label > Choose Table</label>
+        <select type="form-select" name="selected" id="table" required>
+            <option selected>select from here</option>
+            <option value="Table 1">Table 1</option>
+            <option value="Table 2">Table 2</option>
+            <option value="Table 3">Table 3</option>
+
+        </select>
+        <button id="bill" style="background-color: rgb(181, 244, 97);">Add To Bill</button>
+    </form>
+    <ul id="table1">
+        <h4>Table 1</h4>
+
+    </ul>
+    <ul id="table2">
+        <h4>Table 2</h4>
+    </ul>
+    <ul id="table3">
+        <h4>Table 3</h4>
+    </ul>
+
+    <style>
+        * {
+            padding: 4px 8px 4px;
+            border-radius: 4px;
+        }
+
+        h4 {
+            color: brown;
+            background-color: antiquewhite;
+        }
+
+        h3 {
+            text-align: center;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
+    <script>
+        function takeOrder(e) {
+            e.preventDefault();
+            alert("Task added Successfully");
+
+            var price = document.getElementById('price').value;
+            var dish = document.getElementById('dish').value;
+            var table = document.getElementById('table').value;
+
+
+            var obj = {
+                price, dish, table
+            };
+            axios.post("https://crudcrud.com/api/b5adc8582ae94d8d9560d7bb74d57971/todos", obj)
+                .then((response) => {
+                    DispOrder(response.data);
+                })
+                .catch((err) => {
+                    document.body.innerHTML = document.body.innerHTML + "<h4> Something went wrong...<h4>"
+                    console.log(err)
+                })
+        }
+        window.addEventListener("DOMContentLoaded", () => {
+            const data = axios.get("https://crudcrud.com/api/b5adc8582ae94d8d9560d7bb74d57971/todos")
+                .then((response) => {
+                    for (var i = 0; i < response.data.length; i++) {
+                        DispOrder(response.data[i]);
+                    }
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+            console.log(data)
+        })
+        function DispOrder(obj) {
+            var pElement = document.getElementById('table1');
+            var pElement1 = document.getElementById('table2');
+            var pElement2 = document.getElementById('table3');
+
+            var cElement = document.createElement('li');
+
+            cElement.textContent = obj.price + " - " + obj.dish + " - " + obj.table;
+
+            var del = document.createElement('input');
+            del.type = 'button';
+            del.value = 'Delete Order';
+            del.style.backgroundColor="brown";
+
+            function deleteOrder(userId) {
+                axios.delete('https://crudcrud.com/api/b5adc8582ae94d8d9560d7bb74d57971/todos/' + userId)
+                    .then((response) => {
+                        console.log(response);
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+            }
+            cElement.appendChild(del);
+
+            del.onclick = () => {
+
+                if (obj.table === 'Table 1') {
+                    pElement.removeChild(cElement);
+                    deleteOrder(obj._id);
+                }
+                else if (obj.table === 'Table 2') {
+                    pElement1.removeChild(cElement);
+                    deleteOrder(obj._id);
+                }
+                else {
+                    pElement2.removeChild(cElement);
+                    deleteOrder(obj._id);
+                }
+            }
+
+            //pElement.appendChild(cElement);
+            if (obj.table === 'Table 1') {
+                pElement.appendChild(cElement);
+            }
+            else if (obj.table === 'Table 2') {
+                pElement1.appendChild(cElement);
+            }
+            else {
+                pElement2.appendChild(cElement);
+            }
+        }
+    </script>
+</body>
+</html>
